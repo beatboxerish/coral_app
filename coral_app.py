@@ -26,6 +26,7 @@ def convert_image(img):
 
 
 def get_segmentations(upload):
+    model = load_model()
     image = Image.open(upload)
     col1.write("Original Image :camera:")
     col1.image(image)
@@ -47,6 +48,9 @@ def model_pipeline(image, model):
 
 def load_model():
     model = YOLO('yolo_v6_best.pt')
+    if "model" not in st.session_state.keys():
+        st.session_state["model"] = YOLO('yolo_v6_best.pt')
+    model = st.session_state["model"]
     return model
 
 
@@ -70,10 +74,6 @@ def draw_bboxes_xyxyn(bboxes, img):
         y, y1 = y*img.shape[0], y1*img.shape[0]
         cv2.rectangle(drawn_img, (int(x), int(y)), (int(x1), int(y1)), colors[0], 10)
     return drawn_img
-
-with st.spinner('Please wait while we load the model...'):
-    model = load_model()
-
 
 col1, col2 = st.columns(2)
 my_upload = st.sidebar.file_uploader("Upload an image", type=["png", "jpg", "jpeg"])
