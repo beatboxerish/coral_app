@@ -66,19 +66,19 @@ def load_models():
     yolo_model = st.session_state["yolo_model"]
 
     # load sam_model
-    url = "https://dl.fbaipublicfiles.com/segment_anything/sam_vit_h_4b8939.pth"
+    url = "https://dl.fbaipublicfiles.com/segment_anything/sam_vit_b_01ec64.pth"
     device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
     with st.spinner('Downloading SAM model...'):
         if not os.path.exists("sam_weights"):
             os.makedirs('sam_weights')
-            urllib.request.urlretrieve(url, "sam_weights/sam_vit_h_4b8939.pth")
+            urllib.request.urlretrieve(url, "sam_weights/sam_vit_b_01ec64.pth")
     sam_model = get_sam_predictor(url, device)
     return sam_model, yolo_model
 
 
 @st.cache_resource()
 def get_sam_predictor(url, device):
-    sam = sam_model_registry["vit_h"](checkpoint="sam_weights/sam_vit_h_4b8939.pth")
+    sam = sam_model_registry["vit_b"](checkpoint="sam_weights/sam_vit_b_01ec64.pth")
     sam.to(device=device)
     predictor = SamPredictor(sam)
     return predictor
