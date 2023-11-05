@@ -34,7 +34,7 @@ def get_segmentations(upload):
     image = model_pipeline(image, model)
     col2.image(image)
     st.sidebar.markdown("\n")
-    st.sidebar.download_button("Download fixed image", convert_image(image), "segmentations.png", "image/png")
+    st.sidebar.download_button("Download Segmented image", convert_image(image), "segmentations.png", "image/png")
 
 
 def model_pipeline(image, model):
@@ -46,7 +46,7 @@ def model_pipeline(image, model):
 
 
 def load_model():
-    model = YOLO('yolo_model.pt')
+    model = YOLO('yolo_v6_best.pt')
     return model
 
 
@@ -84,4 +84,4 @@ if my_upload is not None:
     else:
         get_segmentations(upload=my_upload)
 else:
-    st.error("Please upload a valid image.")
+    pass
