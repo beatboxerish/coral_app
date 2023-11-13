@@ -43,9 +43,10 @@ def get_segmentations(upload):
     resized_image = resize_image(cv_image, (640, 490))
     yolo_image, bb_result = yolo_inference(resized_image, cv_image, yolo_model)
 
+    import sys
+
     del yolo_model
     print('done with yolo...')
-    import sys
     sys.stdout.flush()
     
     sam_image = sam_inference(sam_model, bb_result, resized_image, cv_image)
@@ -117,6 +118,10 @@ def yolo_inference(resized_image, original_image, model):
 def sam_inference(sam_model, bb_result, resized_image, original_image):
     original_image_size = original_image.shape
     masks, class_ids = get_sam_masks(bb_result, sam_model, resized_image)
+
+    print('got sam masks...')
+    sys.stdout.flush()
+
 
     # resizing segmentation map
     big_masks = [torch.nn.functional.interpolate(i.to(torch.float32).unsqueeze(0),
