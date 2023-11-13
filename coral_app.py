@@ -39,7 +39,7 @@ def get_segmentations(upload):
 
     # sam_image, yolo_image = model_inference(original_image, yolo_model, sam_model)
 
-    cv_image = np.array(image)
+    cv_image = np.array(original_image)
     resized_image = resize_image(cv_image, (640, 490))
     yolo_image, bb_result = yolo_inference(resized_image, cv_image, yolo_model)
 
