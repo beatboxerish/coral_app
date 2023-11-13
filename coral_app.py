@@ -57,8 +57,9 @@ def model_inference(image, yolo_model, sam_model):
     yolo_image, bb_result = yolo_inference(resized_image, cv_image, yolo_model)
     
     print('Done with Yolo inference...')
-
-    sam_image = sam_inference(sam_model, bb_result, resized_image, cv_image)
+    
+    # sam_image = sam_inference(sam_model, bb_result, resized_image, cv_image)
+    sam_image = yolo_image
     print('Done with SAM inference...')
 
     sam_image, yolo_image = Image.fromarray(sam_image), Image.fromarray(yolo_image)
