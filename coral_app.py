@@ -41,29 +41,34 @@ def get_segmentations(upload):
 
     col2.write("Yolo Boxes :white_square_button:")
     col2.image(yolo_image)
-    st.sidebar.markdown("\n")
-    st.sidebar.download_button("Download Image with YOLO Boxes", convert_image(yolo_image), "yolo.png", "image/png")
+    # st.sidebar.markdown("\n")
+    # st.sidebar.download_button("Download Image with YOLO Boxes", convert_image(yolo_image), "yolo.png", "image/png")
 
     col3.write("Segmented Image :robot_face:")
     col3.image(sam_image)
-    st.sidebar.markdown("\n")
-    st.sidebar.download_button("Download Segmented image", convert_image(sam_image), "segmentations.png", "image/png")
+    # st.sidebar.markdown("\n")
+    # st.sidebar.download_button("Download Segmented image", convert_image(sam_image), "segmentations.png", "image/png")
 
 
 def model_inference(image, yolo_model, sam_model):
+    print('Reached Inference...')
     cv_image = np.array(image)
     resized_image = resize_image(cv_image, (640, 490))
     yolo_image, bb_result = yolo_inference(resized_image, cv_image, yolo_model)
+    
+    print('Done with Yolo inference...')
+
     sam_image = sam_inference(sam_model, bb_result, resized_image, cv_image)
+    print('Done with SAM inference...')
+
     sam_image, yolo_image = Image.fromarray(sam_image), Image.fromarray(yolo_image)
     return sam_image, yolo_image
 
 
+@st.cache_resource()
 def load_models():
-    # load yolo_model
-    if "yolo_model" not in st.session_state.keys():
-        st.session_state["yolo_model"] = YOLO('yolo_v6_best.pt')
-    yolo_model = st.session_state["yolo_model"]
+    # load yolo_model 
+    yolo_model = YOLO('yolo_v6_best.pt')
 
     # load sam_model
     url = "https://dl.fbaipublicfiles.com/segment_anything/sam_vit_b_01ec64.pth"
