@@ -55,12 +55,11 @@ def model_inference(image, yolo_model, sam_model):
     cv_image = np.array(image)
     resized_image = resize_image(cv_image, (640, 490))
     yolo_image, bb_result = yolo_inference(resized_image, cv_image, yolo_model)
+
+    del yolo_model
     
-    print('Done with Yolo inference...')
-    
-    # sam_image = sam_inference(sam_model, bb_result, resized_image, cv_image)
-    sam_image = yolo_image
-    print('Done with SAM inference...')
+    sam_image = sam_inference(sam_model, bb_result, resized_image, cv_image)
+    # sam_image = yolo_image
 
     sam_image, yolo_image = Image.fromarray(sam_image), Image.fromarray(yolo_image)
     return sam_image, yolo_image
