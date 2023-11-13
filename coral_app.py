@@ -37,44 +37,42 @@ def get_segmentations(upload):
     col1.write("Original Image :camera:")
     col1.image(original_image)
 
-    # sam_image, yolo_image = model_inference(original_image, yolo_model, sam_model)
+    sam_image, yolo_image = model_inference(original_image, yolo_model, sam_model)
 
-    cv_image = np.array(original_image)
-    resized_image = resize_image(cv_image, (640, 490))
-    yolo_image, bb_result = yolo_inference(resized_image, cv_image, yolo_model)
+    # cv_image = np.array(original_image)
+    # resized_image = resize_image(cv_image, (640, 490))
+    # yolo_image, bb_result = yolo_inference(resized_image, cv_image, yolo_model)
 
-    import sys
+    # import sys
 
-    del yolo_model
-    print('done with yolo...')
-    sys.stdout.flush()
+    # del yolo_model
+    # print('done with yolo...')
+    # sys.stdout.flush()
     
-    sam_image = sam_inference(sam_model, bb_result, resized_image, cv_image)
+    # sam_image = sam_inference(sam_model, bb_result, resized_image, cv_image)
 
-    sam_image, yolo_image = Image.fromarray(sam_image), Image.fromarray(yolo_image)
+    # sam_image, yolo_image = Image.fromarray(sam_image), Image.fromarray(yolo_image)
 
     col2.write("Yolo Boxes :white_square_button:")
     col2.image(yolo_image)
     # st.sidebar.markdown("\n")
     # st.sidebar.download_button("Download Image with YOLO Boxes", convert_image(yolo_image), "yolo.png", "image/png")
 
-    col3.write("Segmented Image :robot_face:")
-    col3.image(sam_image)
+    # col3.write("Segmented Image :robot_face:")
+    # col3.image(sam_image)
     # st.sidebar.markdown("\n")
     # st.sidebar.download_button("Download Segmented image", convert_image(sam_image), "segmentations.png", "image/png")
 
 
 def model_inference(image, yolo_model, sam_model):
-    print('Reached Inference...')
     cv_image = np.array(image)
     resized_image = resize_image(cv_image, (640, 490))
     yolo_image, bb_result = yolo_inference(resized_image, cv_image, yolo_model)
 
-    del yolo_model
-
+    # del yolo_model
     
-    sam_image = sam_inference(sam_model, bb_result, resized_image, cv_image)
-    # sam_image = yolo_image
+    # sam_image = sam_inference(sam_model, bb_result, resized_image, cv_image)
+    sam_image = yolo_image
 
     sam_image, yolo_image = Image.fromarray(sam_image), Image.fromarray(yolo_image)
     return sam_image, yolo_image
