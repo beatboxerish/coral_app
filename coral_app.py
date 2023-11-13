@@ -37,7 +37,17 @@ def get_segmentations(upload):
     col1.write("Original Image :camera:")
     col1.image(original_image)
 
-    sam_image, yolo_image = model_inference(original_image, yolo_model, sam_model)
+    # sam_image, yolo_image = model_inference(original_image, yolo_model, sam_model)
+
+    cv_image = np.array(image)
+    resized_image = resize_image(cv_image, (640, 490))
+    yolo_image, bb_result = yolo_inference(resized_image, cv_image, yolo_model)
+
+    del yolo_model
+    
+    sam_image = sam_inference(sam_model, bb_result, resized_image, cv_image)
+
+    sam_image, yolo_image = Image.fromarray(sam_image), Image.fromarray(yolo_image)
 
     col2.write("Yolo Boxes :white_square_button:")
     col2.image(yolo_image)
