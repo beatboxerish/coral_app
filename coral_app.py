@@ -44,6 +44,9 @@ def get_segmentations(upload):
     yolo_image, bb_result = yolo_inference(resized_image, cv_image, yolo_model)
 
     del yolo_model
+    print('done with yolo...')
+    import sys
+    sys.stdout.flush()
     
     sam_image = sam_inference(sam_model, bb_result, resized_image, cv_image)
 
@@ -67,6 +70,7 @@ def model_inference(image, yolo_model, sam_model):
     yolo_image, bb_result = yolo_inference(resized_image, cv_image, yolo_model)
 
     del yolo_model
+
     
     sam_image = sam_inference(sam_model, bb_result, resized_image, cv_image)
     # sam_image = yolo_image
@@ -97,7 +101,6 @@ def get_sam_predictor(url, device):
     sam.to(device=device)
     predictor = SamPredictor(sam)
     return predictor
-
 
 
 def resize_image(img, size):
