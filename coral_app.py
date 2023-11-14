@@ -7,7 +7,8 @@ import numpy as np
 import torch
 import os
 import urllib
-from segment_anything import sam_model_registry, SamPredictor
+# from segment_anything import sam_model_registry, SamPredictor
+from mobile_sam import sam_model_registry, SamPredictor
 import supervision as sv
 
 
@@ -58,8 +59,8 @@ def get_segmentations(upload):
     # st.sidebar.markdown("\n")
     # st.sidebar.download_button("Download Image with YOLO Boxes", convert_image(yolo_image), "yolo.png", "image/png")
 
-    # col3.write("Segmented Image :robot_face:")
-    # col3.image(sam_image)
+    col3.write("Segmented Image :robot_face:")
+    col3.image(sam_image)
     # st.sidebar.markdown("\n")
     # st.sidebar.download_button("Download Segmented image", convert_image(sam_image), "segmentations.png", "image/png")
 
@@ -68,11 +69,8 @@ def model_inference(image, yolo_model, sam_model):
     cv_image = np.array(image)
     resized_image = resize_image(cv_image, (640, 490))
     yolo_image, bb_result = yolo_inference(resized_image, cv_image, yolo_model)
-
-    # del yolo_model
     
-    # sam_image = sam_inference(sam_model, bb_result, resized_image, cv_image)
-    sam_image = yolo_image
+    sam_image = sam_inference(sam_model, bb_result, resized_image, cv_image)
 
     sam_image, yolo_image = Image.fromarray(sam_image), Image.fromarray(yolo_image)
     return sam_image, yolo_image
@@ -85,19 +83,25 @@ def load_models():
 
     # load sam_model
     url = "https://dl.fbaipublicfiles.com/segment_anything/sam_vit_b_01ec64.pth"
+    url = "https://github.com/ChaoningZhang/MobileSAM/raw/master/weights/mobile_sam.pt"
     device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
-    with st.spinner('Downloading SAM model...'):
-        if not os.path.exists("sam_weights"):
-            os.makedirs('sam_weights')
-            urllib.request.urlretrieve(url, "sam_weights/sam_vit_b_01ec64.pth")
+    if not os.path.exists("sam_weights"):
+        os.makedirs('sam_weights')
+        # import urllib.request as req
+        # fname = "sam_weights/mobile_sam.pt"
+        # with req.urlopen(url) as d, open(fname, "wb") as opfile:
+        #     data = d.read()
+        #     opfile.write(data)
+        urllib.request.urlretrieve(url, "sam_weights/mobile_sam.pt")
     sam_model = get_sam_predictor(url, device)
     return sam_model, yolo_model
 
 
 @st.cache_resource()
 def get_sam_predictor(url, device):
-    sam = sam_model_registry["vit_b"](checkpoint="sam_weights/sam_vit_b_01ec64.pth")
+    sam = sam_model_registry["vit_t"](checkpoint="sam_weights/mobile_sam.pt")
     sam.to(device=device)
+    sam.eval()
     predictor = SamPredictor(sam)
     return predictor
 
@@ -117,8 +121,8 @@ def sam_inference(sam_model, bb_result, resized_image, original_image):
     original_image_size = original_image.shape
     masks, class_ids = get_sam_masks(bb_result, sam_model, resized_image)
 
-    print('got sam masks...')
-    sys.stdout.flush()
+    # print('got sam masks...')
+    # sys.stdout.flush()
 
 
     # resizing segmentation map
@@ -145,6 +149,27 @@ def get_sam_masks(yolo_result, sam, resized_image):
         multimask_output=False
     )
     return masks, class_ids
+
+
+def get_mobile_sam_masks(yolo_result, sam, resized_image):
+  # multiple bounding boxes as input for a single image
+  input_boxes = yolo_result.boxes.xyxy
+  class_ids = yolo_result.boxes.cls.cpu().numpy()
+
+  mask_predictor = SamPredictor(sam)
+  transformed_boxes = input_boxes.cpu().numpy()
+  mask_predictor.set_image(resized_image)
+  masks_array = []
+  for box in transformed_boxes:
+    masks, iou_predictions, low_res_masks = mask_predictor.predict(
+        point_coords=None,
+        point_labels=None,
+        box=box,
+        multimask_output=False
+    )
+    masks_array.append(masks)
+
+  return masks_array, class_ids
 
 
 def draw_bboxes_xyxyn(bboxes, img):

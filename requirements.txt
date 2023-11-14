@@ -1,4 +1,6 @@
 opencv-python-headless
 ultralytics==8.0.206
 supervision
-git+https://github.com/facebookresearch/segment-anything.git
+git+https://github.com/ChaoningZhang/MobileSAM.git
+timm
+
