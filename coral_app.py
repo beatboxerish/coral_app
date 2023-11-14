@@ -17,7 +17,7 @@ st.set_page_config(layout="wide", page_title="Coral Segmentation App")
 
 st.write("## Segment your Corals and Ref box")
 st.write(
-    ":dog: Upload an image with corals and center reference white tile. Final image can be downloaded from the sidebar."
+    ":dog: Upload an image with corals and center reference white tile to get the YOLO and Segmentation predictions!"
 )
 st.sidebar.write("## Upload and download :gear:")
 
